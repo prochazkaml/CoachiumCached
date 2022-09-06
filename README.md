@@ -1,7 +1,7 @@
 # Coachium (pre-cached)
 Web-based software for interfacing with CMA educational interfaces, cached
 
-Recommended for institutions which want to use Coachium in lessons. This cached version has the benefit of being able to run offline, as it installs itself into the browser's filesystem upon startup and updates every time.
+Recommended for institutions which want to use Coachium in lessons. This cached version has the benefit of being smaller in space and able to run offline, as it installs itself into the browser's filesystem upon startup and updates every time.
 
 For more infomation about what Coachium is, please visit the [parent repo](https://github.com/prochazkaml/Coachium).
 

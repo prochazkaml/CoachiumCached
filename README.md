@@ -22,6 +22,8 @@ const DEFAULT_LANGUAGE_OVERRIDE = "cs";
 
 There, replace `cs` by your preferred language (i.e. `en` – see the [`js/i18n` directory of the parent repo](https://github.com/prochazkaml/Coachium/tree/master/js/i18n) for all supported languages). Save the changes, and Coachium should be ready to use on your server!
 
+**NOTE: DO NOT REMOVE THIS LINE! IT IS USED BY THE PROGRAM TO DETECT WHETHER IT IS RUNNING CACHED!!!**
+
 To update your existing instance of Coachium to the latest version, run the following:
 
 ```bash

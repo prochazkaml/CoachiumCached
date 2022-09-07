@@ -32,3 +32,5 @@ To update your existing instance of Coachium to the latest version, run the foll
 cd /var/www/html/coachium # Or wherever you installed Coachium
 git pull
 ```
+
+**PRO TIP: Set up a Cron job to do this automatically for you.**

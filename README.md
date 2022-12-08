@@ -5,7 +5,7 @@ Recommended for institutions which want to use Coachium in lessons. This cached 
 
 For more infomation about what Coachium is, please visit the [parent repo](https://github.com/prochazkaml/Coachium).
 
-Our [central instance](https://coachiumcached.prochazka.ml/) has an example running (in Czech by default).
+Our [central instance](https://coachium.prochazka.ml/) has an example running (in Czech by default).
 
 ## How to set it up on a server
 

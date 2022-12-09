@@ -26,17 +26,23 @@
 
 			async function processfile(net, decompress) {
 				if(decompress) {
-					console.log("- Fetched file is compressed, decompressing.");
-//					return await net.text();
+					console.log("Fetched file is compressed, decompressing.");
 					return LZString.decompressFromUint8Array(new Uint8Array(await net.arrayBuffer()));
 				} else {
-					console.log("- Fetched file is plaintext, loading as-is.");
+					console.log("Fetched file is plaintext, loading as-is.");
 					return await net.text();
 				}
 			}
 
-			async function load(status, name, decompress) {
+			async function load(status, name, download, decompress) {
+				return (await loadandcompare(status, name, download, decompress)).data;
+			}
+
+			async function loadandcompare(status, name, download, decompress) {
 				var file = null;
+				var compare = true;
+
+				console.log("%cRequested " + name + ", should " + (download ? "download" : "load from DB") + ", DB status " + status, "font-weight: bold;");
 
 				if(status == "ok") {
 					// Load the existing cache file
@@ -47,43 +53,52 @@
 
 					// Try fetching a fresh one off the net
 
-					if(navigator.onLine || window.location.origin.endsWith("localhost")) {
+					if(download && (navigator.onLine || window.location.origin.endsWith("localhost"))) {
 						try {
-							console.log("- Attempting to fetch...");
+							console.log("Attempting to fetch...");
 
 							var net = await fetch(name + "?t=" + new Date().getTime());
 
 							if(net.status == 200) {
 								// New cache file successfully loaded, store it in the DB
 
-								file = await processfile(net, decompress);
+								newfile = await processfile(net, decompress);
+
+								if(file != newfile) compare = false;
+
+								file = newfile;
 
 								await Database.Write(name, file);
 							} else {
-								console.log("- Fetch failed.");
+								console.log("Fetch failed.");
 							}
 						} catch(e) {
-							console.log("- Fetch failed.");
+							console.log("Fetch failed.");
 							// Well, bollocks
 						}
 					}
 				} else {
 					// Failsafe in case the DB is broken - load the file straight off the net - do not store in DB
 
-					console.log("- DB failed to load, attempting to fetch as a last resort...")
+					console.log("DB failed to load, attempting to fetch as a last resort...");
 
 					try {
 						var net = await fetch(name + "?t=" + new Date().getTime());
 
 						if(net.status == 200) {
 							file = await processfile(net, decompress);
+						} else {
+							console.log("Fetch failed.");
 						}
 					} catch(e) {
-						// Well, bollocks
+						console.log("Fetch failed.");
 					}
 				}
 
-				return file;
+				return {
+					data: file,
+					compare: compare
+				};
 			}
 
 			var Database = {
@@ -211,12 +226,18 @@
 				
 				var status = await Database.Open();
 
-				const scriptsfile = await load(status, "scripts.dat", true);
-				const headfile = await load(status, "head.dat", false);
-				const bodyfile = await load(status, "body.dat", true);
+				const timestamp = await loadandcompare(status, "timestamp", true, false);
+
+				console.log(timestamp)
+
+				const download = !timestamp.compare;
+
+				const scriptsfile = await load(status, "scripts.dat", download, true);
+				const headfile = await load(status, "head.dat", download, false);
+				const bodyfile = await load(status, "body.dat", download, true);
 
 				if(bodyfile && headfile && scriptsfile) {
-					console.log("Assets loaded fine. Starting Coachium.");
+					console.log("%cAssets loaded fine. Starting Coachium.", "font-weight: bold;");
 
 					document.head.innerHTML += headfile;
 					document.body.innerHTML += bodyfile;
@@ -230,6 +251,10 @@
 					document.body.append(script);
 					
 					window_onload();
+				} else {
+					console.log("%cSomething went horribly wrong, and Coachium was unable to start properly.", "font-weight: bold;");
+					document.getElementsByTagName("html")[0].style.opacity = "1";
+					document.body.innerHTML = "<h1>Something went horribly wrong, and Coachium was unable to start properly.</h1><p>Please visit the <a href=\"https://coachiumuncached.prochazka.ml\">uncached Coachium variant</a>.</p><p>We apologize for the inconvenience.</p>";
 				}
 			}
 

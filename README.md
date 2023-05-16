@@ -33,4 +33,4 @@ cd /var/www/html/coachium # Or wherever you installed Coachium
 git pull
 ```
 
-**PRO TIP: Set up a Cron job to do this automatically for you.**
+**PRO TIP: In this repo, there's also a [PHP script](https://github.com/prochazkaml/CoachiumCached/blob/master/cronupdate.php) for updating your copy of Coachium. Set up a Cron job to run it automatically for you (for example, at midnight).**
